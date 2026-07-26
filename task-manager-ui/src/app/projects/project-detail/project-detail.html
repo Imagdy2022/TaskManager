@@ -1,0 +1,66 @@
+<div class="page-container" *ngIf="project">
+  <div class="page-header">
+    <div>
+      <a routerLink="/projects" class="back-link">← All Projects</a>
+      <h1>{{ project.name }}</h1>
+      <p class="description">{{ project.description || 'No description.' }}</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">+ Add Task</button>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+  <div class="filter-bar">
+    <label>Filter by status:</label>
+    <select [(ngModel)]="statusFilter" (change)="applyFilter()" class="form-control status-filter">
+      <option value="">All</option>
+      <option value="0">To Do</option>
+      <option value="1">In Progress</option>
+      <option value="2">Done</option>
+    </select>
+  </div>
+
+  <div *ngIf="filteredTasks.length === 0" class="empty-state">No tasks found.</div>
+
+  <div class="task-list">
+    <div class="task-card" *ngFor="let task of filteredTasks" [class]="'status-' + task.status">
+      <div class="task-card-body">
+        <div class="task-header">
+          <h3>{{ task.title }}</h3>
+          <span class="badge" [ngClass]="'badge-' + task.status">{{ task.statusLabel }}</span>
+        </div>
+        <p *ngIf="task.description">{{ task.description }}</p>
+        <p *ngIf="task.dueDate" class="due-date">Due: {{ task.dueDate | date:'mediumDate' }}</p>
+      </div>
+      <div class="task-card-actions">
+        <select
+          class="form-control status-select"
+          [value]="task.status"
+          (change)="changeStatus(task.id, +$any($event.target).value)">
+          <option value="0">To Do</option>
+          <option value="1">In Progress</option>
+          <option value="2">Done</option>
+        </select>
+        <button class="btn btn-sm btn-outline" (click)="openEdit(task)">Edit</button>
+        <button class="btn btn-sm btn-danger" (click)="confirmDelete(task.id)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="loading" class="loading">Loading...</div>
+
+<app-task-form
+  *ngIf="showForm"
+  [task]="editingTask"
+  [projectId]="projectId"
+  (saved)="onFormSaved()"
+  (cancelled)="onFormCancelled()">
+</app-task-form>
+
+<app-confirm-dialog
+  *ngIf="showConfirm"
+  message="Are you sure you want to delete this task?"
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="onDeleteCancelled()">
+</app-confirm-dialog>

@@ -1,0 +1,40 @@
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ task ? 'Edit Task' : 'New Task' }}</h2>
+      <button class="btn-close" (click)="onCancel()">×</button>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-group">
+        <label>Title *</label>
+        <input formControlName="title" class="form-control" placeholder="Task title" />
+        <span class="error" *ngIf="form.get('title')?.invalid && form.get('title')?.touched">
+          Title is required (max 300 chars).
+        </span>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea formControlName="description" class="form-control" rows="3" placeholder="Optional description"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select formControlName="status" class="form-control">
+          <option [value]="0">To Do</option>
+          <option [value]="1">In Progress</option>
+          <option [value]="2">Done</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Due Date</label>
+        <input formControlName="dueDate" type="date" class="form-control" />
+      </div>
+      <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" (click)="onCancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || saving">
+          {{ saving ? 'Saving…' : 'Save' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
